@@ -1,0 +1,17 @@
+[project]
+name = "paperpilot"
+version = "0.1.0"
+description = "Ask questions about research PDFs and get answers cited to the exact section and page."
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["B008"]  # FastAPI's File(...) default is the documented pattern

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PaperPilot · Ask your papers</title>
+  <meta name="description" content="Ask questions about research PDFs and get answers cited to the exact section and page." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%236d5efc'/><path d='M9 22 23 10M14 10h9v9' stroke='white' stroke-width='3' fill='none' stroke-linecap='round'/></svg>" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-label="Your papers">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M9 22 23 10M14 10h9v9" /></svg>
+        </span>
+        <div>
+          <h1>PaperPilot</h1>
+          <p class="tagline">Answers you can check</p>
+        </div>
+      </div>
+
+      <label class="dropzone" id="dropzone" tabindex="0">
+        <input type="file" id="file-input" accept="application/pdf,.pdf" hidden />
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" /></svg>
+        <span class="dz-title">Drop a PDF here</span>
+        <span class="dz-sub">or click to browse · max 25 MB</span>
+      </label>
+
+      <div class="library-head">
+        <h2>Library</h2>
+        <span class="count" id="doc-count">0</span>
+      </div>
+      <ul class="library" id="library"></ul>
+
+      <footer class="status" id="status">
+        <span class="dot"></span><span id="status-text">Connecting…</span>
+      </footer>
+    </aside>
+
+    <main class="chat" aria-live="polite">
+      <header class="chat-head">
+        <div>
+          <p class="eyebrow" id="doc-meta">No paper selected</p>
+          <h2 id="doc-title">Upload a paper to start</h2>
+        </div>
+        <button class="ghost" id="toggle-sections" hidden>Sections</button>
+      </header>
+
+      <div class="sections-bar" id="sections-bar" hidden></div>
+
+      <section class="messages" id="messages">
+        <div class="empty" id="empty">
+          <div class="empty-art" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <h3>Ask questions, get cited answers</h3>
+          <p>Every answer links to the section and page it came from. If the paper doesn't say it, PaperPilot tells you instead of guessing.</p>
+          <div class="suggestions" id="suggestions"></div>
+        </div>
+      </section>
+
+      <form class="composer" id="composer">
+        <input id="question" type="text" placeholder="Ask about the method, datasets, results, limitations…" autocomplete="off" maxlength="500" disabled />
+        <button type="submit" id="ask-btn" disabled aria-label="Ask">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
+        </button>
+      </form>
+    </main>
+
+    <aside class="source" id="source" aria-label="Source passage" hidden>
+      <header>
+        <div>
+          <p class="eyebrow">Source</p>
+          <h3 id="source-title"></h3>
+        </div>
+        <button class="icon" id="source-close" aria-label="Close source">✕</button>
+      </header>
+      <blockquote id="source-text"></blockquote>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="alert" hidden></div>
+  <script src="/static/app.js" type="module"></script>
+</body>
+</html>
