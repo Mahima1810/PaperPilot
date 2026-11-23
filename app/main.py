@@ -33,6 +33,14 @@ def create_app(data_dir: Path | None = None, client: ChatClient | None = None) -
         version="0.1.0",
     )
     store = DocumentStore(data_dir or Path(os.getenv("PAPERPILOT_DATA", ROOT / "data")))
+
+    # Optional: pre-load PDFs (used by the hosted demo so visitors can try it immediately).
+    if seed_dir := os.getenv("PAPERPILOT_SEED_DIR"):
+        for pdf in sorted(Path(seed_dir).glob("*.pdf")):
+            try:
+                store.add(pdf.name, pdf.read_bytes())
+            except (PDFParseError, ValueError, OSError):
+                pass  # a bad seed file must never stop the server from starting
     if client is None:
         config = LLMConfig.from_env()
         client = ChatClient(config) if config else None

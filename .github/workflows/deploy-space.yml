@@ -1,0 +1,62 @@
+name: Deploy to Hugging Face Space
+
+# Runs after every push to main and sends the app to a Hugging Face Space (free hosting).
+# One-time setup in this GitHub repo (Settings → Secrets and variables → Actions):
+#   - secret   HF_TOKEN  = a Hugging Face access token with "Write" permission
+#   - variable HF_SPACE  = <your-hf-username>/paperpilot
+# Until HF_SPACE is set, this workflow is skipped.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    if: ${{ vars.HF_SPACE != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add Hugging Face Space settings to the README
+        run: |
+          {
+            printf -- '---\n'
+            printf 'title: PaperPilot\n'
+            printf 'emoji: "✈️"\n'
+            printf 'colorFrom: indigo\n'
+            printf 'colorTo: green\n'
+            printf 'sdk: docker\n'
+            printf 'app_port: 8000\n'
+            printf 'pinned: false\n'
+            printf 'license: mit\n'
+            printf 'short_description: Answers about research papers, cited to the page\n'
+            printf -- '---\n\n'
+            cat README.md
+          } > README.space.md
+          mv README.space.md README.md
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install "huggingface_hub>=0.25"
+
+      - name: Upload to the Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE: ${{ vars.HF_SPACE }}
+        run: |
+          python - <<'EOF'
+          import os
+          from huggingface_hub import HfApi
+
+          HfApi(token=os.environ["HF_TOKEN"]).upload_folder(
+              folder_path=".",
+              repo_id=os.environ["HF_SPACE"],
+              repo_type="space",
+              ignore_patterns=[".git/*", ".github/*", "tests/*", "data/*.json", "**/__pycache__/*"],
+              commit_message="Deploy from GitHub",
+          )
+          print("Deployed to https://huggingface.co/spaces/" + os.environ["HF_SPACE"])
+          EOF
