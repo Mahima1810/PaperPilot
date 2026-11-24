@@ -4,6 +4,18 @@ version = "0.1.0"
 description = "Ask questions about research PDFs and get answers cited to the exact section and page."
 requires-python = ">=3.10"
 license = { text = "MIT" }
+# Keep in sync with requirements.txt. Vercel installs from this list, not from requirements.txt.
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "python-multipart>=0.0.9",
+    "pypdf>=4.0",
+    "rank-bm25>=0.2.2",
+    "scikit-learn>=1.4",
+    "numpy>=1.26",
+    "httpx>=0.27",
+    "pydantic>=2.6",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
