@@ -83,26 +83,37 @@ def verify_citations(text: str, n_passages: int) -> tuple[str, set[int]]:
     return re.sub(r"\s+([.,;])", r"\1", cleaned).strip(), valid
 
 
+def _terms(text: str) -> set[str]:
+    return set(tokenize(text))
+
+
 def extractive_answer(question: str, hits: list[Hit], max_sentences: int = 3) -> Answer:
-    """Pick the sentences from the top passages that share the most terms with the question."""
-    q_terms = set(tokenize(question))
+    """Pick the sentences from the top passages that share the most terms with the question.
+
+    A sentence also gets credit for words in its section heading: in "4 Results", the sentence
+    "Rank 16 adapters reached 27.1 BLEU" answers "What are the results?" without saying "results".
+    """
+    q_terms = _terms(question)
     scored: list[tuple[float, int, str]] = []
     seen: set[str] = set()
     for n, hit in enumerate(hits, start=1):
+        section_overlap = len(q_terms & _terms(hit.chunk.section))
+        # The title/author block rarely answers a question; rank it below real body text.
+        front_matter = -1.0 if hit.chunk.section.lower() == "front matter" else 0.0
         for sent in split_sentences(neutralize_refs(hit.chunk.text)):
             key = re.sub(r"\W+", "", sent.lower())
             # Neighbouring chunks overlap, so skip repeats (including a sentence cut short at a chunk edge).
             if not key or any(key in k or k in key for k in seen):
                 continue
             seen.add(key)
-            terms = set(tokenize(sent))
+            terms = _terms(sent)
             if not terms:
                 continue
-            overlap = len(q_terms & terms)
+            overlap = len(q_terms & terms) + section_overlap
             if overlap:
                 # prefer high overlap, then higher-ranked passages, then complete sentences
                 complete = 0.5 if sent.rstrip().endswith((".", "!", "?")) else 0.0
-                scored.append((overlap + hit.score * 10 + complete, n, sent))
+                scored.append((overlap + hit.score * 10 + complete + front_matter, n, sent))
     if not scored:
         return Answer(answer=NOT_FOUND, mode="not_found")
 

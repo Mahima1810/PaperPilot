@@ -21,8 +21,13 @@ TOKEN = re.compile(r"[a-z0-9]+(?:[-'][a-z0-9]+)*")
 RRF_K = 60
 
 
+def _singular(token: str) -> str:
+    """Light plural strip so "datasets" matches "dataset" and "results" matches "result"."""
+    return token[:-1] if len(token) > 3 and token.endswith("s") and not token.endswith(("ss", "us", "is")) else token
+
+
 def tokenize(text: str) -> list[str]:
-    return [t for t in TOKEN.findall(text.lower()) if t not in ENGLISH_STOP_WORDS]
+    return [_singular(t) for t in TOKEN.findall(text.lower()) if t not in ENGLISH_STOP_WORDS]
 
 
 @dataclass

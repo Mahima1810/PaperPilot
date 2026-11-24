@@ -120,3 +120,19 @@ def test_paper_reference_numbers_are_not_citations():
     from app.answerer import neutralize_refs
 
     assert neutralize_refs("We used Adam [20] and dropout [3, 4].") == "We used Adam (ref. 20) and dropout (ref. 3, 4)."
+
+
+@pytest.mark.parametrize(
+    "question, expected_section",
+    [("What are the main results?", "Results"), ("What are the limitations?", "Limitations")],
+)
+def test_section_heading_counts_as_a_match(retriever, question, expected_section):
+    # Body sentences in "4 Results" never say "results"; the heading alone must be enough to answer.
+    answer = answer_question(question, retriever.search(question, k=5), None)
+    assert answer.mode == "extractive"
+    assert expected_section in answer.citations[0].section
+
+
+def test_plural_question_matches_singular_text(retriever):
+    answer = answer_question("What datasets were used?", retriever.search("What datasets were used?", k=5), None)
+    assert any("Experiments" in c.section for c in answer.citations)
