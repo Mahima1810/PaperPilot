@@ -10,6 +10,8 @@
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 ![Contributions welcome](https://img.shields.io/badge/contributions-welcome-6d5efc)
 
+**[▶ Try the live demo](https://paper-pilot-livid.vercel.app)** — a sample paper is preloaded, so you can ask questions right away.
+
 <img src="docs/screenshot.jpg" alt="PaperPilot answering a question about the LoRA paper with numbered citations" width="900" />
 
 </div>
@@ -49,6 +51,8 @@ flowchart LR
 ```
 
 ## Quick start
+
+> The [hosted demo](https://paper-pilot-livid.vercel.app) runs on Vercel's free plan. It always has the sample paper; a PDF you upload there may disappear after a few minutes, because each server copy keeps its own temporary storage. Run it locally to keep your library.
 
 ```bash
 git clone https://github.com/Mahima1810/paperpilot.git
@@ -91,7 +95,7 @@ docker run -p 8000:8000 -v paperpilot-data:/app/data paperpilot
 
 ```bash
 pip install -r requirements-dev.txt
-pytest          # 19 tests: parser, retrieval, citation checks, LLM fallback, API flow
+pytest          # 22 tests: parser, retrieval, answer selection, citation checks, LLM fallback, API flow
 ruff check .
 ```
 
